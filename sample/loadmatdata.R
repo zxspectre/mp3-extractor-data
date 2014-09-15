@@ -8,7 +8,8 @@ createneuralnet <- function(){
   nn.data.vars<-paste(names(nn.data)[1:ncol(nn.data)-1],"",collapse="+")
   nn.expr=paste(names(nn.data)[ncol(nn.data)],"~",nn.data.vars)
   #print(summary(nn.data$label))
-  net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="ce", linear.output=FALSE)
+  print(dim(nn.data))
+  net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="ce", linear.output=FALSE,stepmax = 1e+05,threshold=1)
   #net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="sse", linear.output=TRUE)
 }
 
@@ -38,13 +39,22 @@ loadmatdata <- function(){
 
 processmatfile <- function(filename){
   varname<-str_match(filename,"(.*?)\\.mat")[2]
-  data<-readMat(filename)
-  varsize<-dim(data[[varname]])
+  datam<-readMat(filename)
+  varsize<-dim(datam[[varname]])
   #print(filename)
-  output<-matrix(data[[varname]],ncol=varsize[2],nrow=varsize[1])
+  output<-matrix(datam[[varname]],ncol=varsize[2],nrow=varsize[1])
   res<-t(output)
   #names(res)<-varname
   return(res)
+}
+
+processtestfile <- function(filename){
+  varname<-str_match(filename,"test(.*?)\\.mat")[2]
+  datam<-readMat(filename)
+  varsize<-dim(datam[[varname]])
+  output<-matrix(datam[[varname]],ncol=varsize[2],nrow=varsize[1])
+  res<-t(output)
+  return(res[floor(dim(res)[1]*0.49):floor(dim(res)[1]*0.51),])
 }
 
 
