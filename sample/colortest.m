@@ -1,6 +1,6 @@
 function colortest()
 
-maxLabelCount = 3;
+maxLabelCount = 5;
 palette=hsv(maxLabelCount + 1);
 colors=[ones(1,3).*palette(1,:)];
 data=[0,0];

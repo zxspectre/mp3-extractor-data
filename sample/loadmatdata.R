@@ -9,7 +9,7 @@ createneuralnet <- function(){
   nn.expr=paste(names(nn.data)[ncol(nn.data)],"~",nn.data.vars)
   #print(summary(nn.data$label))
   print(dim(nn.data))
-  net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="ce", linear.output=FALSE,stepmax = 1e+05,threshold=1)
+  net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="ce", linear.output=FALSE,stepmax = 1e+05,threshold=100)
   #net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="sse", linear.output=TRUE)
 }
 
