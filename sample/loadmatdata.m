@@ -70,4 +70,4 @@ end;
 eigenval=eigenval';
 
 
-scatter(projectedData(:,1),projectedData(:,2),3, colors);
+scatter(projectedData(:,1),projectedData(:,2),1, colors);

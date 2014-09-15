@@ -8,8 +8,8 @@ createneuralnet <- function(){
   nn.data.vars<-paste(names(nn.data)[1:ncol(nn.data)-1],"",collapse="+")
   nn.expr=paste(names(nn.data)[ncol(nn.data)],"~",nn.data.vars)
   #print(summary(nn.data$label))
-  #net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="ce", linear.output=FALSE)
-  net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="sse", linear.output=TRUE)
+  net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="ce", linear.output=FALSE)
+  #net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="sse", linear.output=TRUE)
 }
 
 loadmatdata <- function(){
