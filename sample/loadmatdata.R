@@ -9,8 +9,8 @@ createneuralnet <- function(){
   nn.expr=paste(names(nn.data)[ncol(nn.data)],"~",nn.data.vars)
   #print(summary(nn.data$label))
   print(dim(nn.data))
-  net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="ce", linear.output=FALSE
-                 ,stepmax = 1e+05,threshold=30,lifesign = "full"
+  net<-neuralnet(nn.expr,nn.data,hidden=c(100,10),rep=1,err.fct="sse", linear.output=FALSE
+                 ,stepmax = 1e+05,threshold=1,lifesign = "full",lifesign.step=10
                  ,learningrate.factor = list(minus = 0.5, plus = 1.2))
   #net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="sse", linear.output=TRUE)
 }
@@ -48,10 +48,11 @@ processmatfile <- function(filename){
   res<-t(output)
   #names(res)<-varname
   return(res)
+  #return(res[floor(dim(res)[1]*0.49):floor(dim(res)[1]*0.51),])
 }
 
 processtestfile <- function(filename){
-  varname<-str_match(filename,"test(.*?)\\.mat")[2]
+  varname<-str_match(filename,"(.*?)\\.mat")[2]
   datam<-readMat(filename)
   varsize<-dim(datam[[varname]])
   output<-matrix(datam[[varname]],ncol=varsize[2],nrow=varsize[1])
@@ -59,4 +60,5 @@ processtestfile <- function(filename){
   return(res[floor(dim(res)[1]*0.49):floor(dim(res)[1]*0.51),])
 }
 
+#mean(compute(nnet,processtestfile("heavy6.mat"))$net.result)
 
