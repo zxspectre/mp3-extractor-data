@@ -9,9 +9,13 @@ createneuralnet <- function(){
   nn.expr=paste(names(nn.data)[ncol(nn.data)],"~",nn.data.vars)
   #print(summary(nn.data$label))
   print(dim(nn.data))
-  net<-neuralnet(nn.expr,nn.data,hidden=c(100,10),rep=1,err.fct="sse", linear.output=FALSE
-                 ,stepmax = 1e+05,threshold=1,lifesign = "full",lifesign.step=10
-                 ,learningrate.factor = list(minus = 0.5, plus = 1.2))
+  weights<-readMat("100-10-weights2.mat")
+  errfct<-function(x,y,z){
+    1/2 * (y - x)^2 + z
+  }
+  net<-neuralnet(nn.expr,nn.data,hidden=c(100,10),rep=1,err.fct=errfct, linear.output=FALSE
+                 ,stepmax = 1e+05,threshold=0.001,lifesign = "full",lifesign.step=1
+                 ,learningrate.factor = list(minus = 0.5, plus = 1.2),startweights=weights)
   #net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="sse", linear.output=TRUE)
 }
 
@@ -47,8 +51,8 @@ processmatfile <- function(filename){
   output<-matrix(datam[[varname]],ncol=varsize[2],nrow=varsize[1])
   res<-t(output)
   #names(res)<-varname
-  return(res)
-  #return(res[floor(dim(res)[1]*0.49):floor(dim(res)[1]*0.51),])
+  #return(res)
+  return(res[floor(dim(res)[1]*0.3):floor(dim(res)[1]*0.6),])
 }
 
 processtestfile <- function(filename){
@@ -61,4 +65,5 @@ processtestfile <- function(filename){
 }
 
 #mean(compute(nnet,processtestfile("heavy6.mat"))$net.result)
+#writeMat("100-10-weights.mat",weights=nnet$weights)
 
