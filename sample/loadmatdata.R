@@ -1,21 +1,16 @@
 library("stringr")
 library("R.matlab")
-library("neuralnet")
+library("nnet")
 
 createneuralnet <- function(){
   #use registerDoMC 
   nn.data<-loadmatdata()  
-  nn.data.vars<-paste(names(nn.data)[1:ncol(nn.data)-1],"",collapse="+")
-  nn.expr=paste(names(nn.data)[ncol(nn.data)],"~",nn.data.vars)
+  #nn.data.vars<-paste(names(nn.data)[1:ncol(nn.data)-1],"",collapse="+")
+  #nn.expr=paste(names(nn.data)[ncol(nn.data)],"~",nn.data.vars)
   #print(summary(nn.data$label))
   print(dim(nn.data))
-  weights<-readMat("100-10-weights2.mat")
-  errfct<-function(x,y,z){
-    1/2 * (y - x)^2 + z
-  }
-  net<-neuralnet(nn.expr,nn.data,hidden=c(100,10),rep=1,err.fct=errfct, linear.output=FALSE
-                 ,stepmax = 1e+05,threshold=0.001,lifesign = "full",lifesign.step=1
-                 ,learningrate.factor = list(minus = 0.5, plus = 1.2),startweights=weights)
+  net<-nnet(nn.data[,1:512], nn.data[,513], size = 10, rang = 0.05, decay = 0.1, maxit = 200,MaxNWts=5141)
+  
   #net<-neuralnet(nn.expr,nn.data,hidden=0,rep=1,err.fct="sse", linear.output=TRUE)
 }
 
@@ -55,8 +50,20 @@ processmatfile <- function(filename){
   return(res[floor(dim(res)[1]*0.3):floor(dim(res)[1]*0.6),])
 }
 
-processtestfile <- function(filename){
+processmatfile2 <- function(filename){
   varname<-str_match(filename,"(.*?)\\.mat")[2]
+  datam<-readMat(filename)
+  varsize<-dim(datam[[varname]])
+  #print(filename)
+  output<-matrix(datam[[varname]],ncol=varsize[2],nrow=varsize[1])
+  res<-t(output)
+  #names(res)<-varname
+  #return(res)
+  return(res[floor(dim(res)[1]*0.49):floor(dim(res)[1]*0.51),])
+}
+
+processtestfile <- function(filename){
+  varname<-str_match(filename,"test(.*?)\\.mat")[2]
   datam<-readMat(filename)
   varsize<-dim(datam[[varname]])
   output<-matrix(datam[[varname]],ncol=varsize[2],nrow=varsize[1])
@@ -64,6 +71,30 @@ processtestfile <- function(filename){
   return(res[floor(dim(res)[1]*0.49):floor(dim(res)[1]*0.51),])
 }
 
-#mean(compute(nnet,processtestfile("heavy6.mat"))$net.result)
+printtestres <- function(nnet3){
+  print("Train res")
+  print("Should be 0:")
+  print(mean(predict(nnet3,processmatfile2("heavy0.mat"))))
+  print(mean(predict(nnet3,processmatfile2("heavy1.mat"))))
+  print(mean(predict(nnet3,processmatfile2("heavy2.mat"))))
+  print("Should be 1:")
+  print(mean(predict(nnet3,processmatfile2("power0.mat"))))
+  print(mean(predict(nnet3,processmatfile2("power1.mat"))))
+  print(mean(predict(nnet3,processmatfile2("power2.mat"))))
+  print("Test res")
+  print("Should be 0:")
+  print(mean(predict(nnet3,processtestfile("testheavy3.mat"))))
+  print(mean(predict(nnet3,processtestfile("testheavy4.mat"))))
+  print(mean(predict(nnet3,processtestfile("testheavy5.mat"))))
+  print(mean(predict(nnet3,processtestfile("testheavy6.mat"))))
+  print("Should be 1:")
+  print(mean(predict(nnet3,processtestfile("testpower3.mat"))))
+  print(mean(predict(nnet3,processtestfile("testpower4.mat"))))
+  print(mean(predict(nnet3,processtestfile("testpower5.mat"))))
+  print(mean(predict(nnet3,processtestfile("testpower6.mat"))))
+}
+
+#mean(predict(nnet3,processtestfile("heavy6.mat")))
+
 #writeMat("100-10-weights.mat",weights=nnet$weights)
 
